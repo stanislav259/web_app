@@ -1,0 +1,37 @@
+{% extends 'main/layout.html' %}
+
+{% block title %}Новости на сайте{% endblock %}
+
+{% block content %}
+<div class="features">
+    <h1>Новости на сайте</h1>
+    
+    <div class="news-list">
+        {% for el in news %}
+        <div class="news-card-horizontal">
+            {% if el.image %}
+            <div class="card-image-side">
+                <img src="{{ el.image.url }}" alt="{{ el.title }}">
+            </div>
+            {% endif %}
+            <div class="card-content-side">
+                <h3>{{ el.title }}</h3>
+                <div class="card-meta">
+                    <span>📅 {{ el.date|date:"d.m.Y H:i" }}</span>
+                    <span>👤 {{ el.author.username }}</span>
+                </div>
+                <p>{{ el.anons|truncatewords:30 }}</p>
+                <div class="card-rating">
+                    <span class="likes">👍 {{ el.likes.count }}</span>
+                    <span class="dislikes">👎 {{ el.dislikes.count }}</span>
+                </div>
+                <a href="{% url 'news-detail' el.id %}" class="read-more">Читать далее →</a>
+            </div>
+        </div>
+        {% empty %}
+        <p>Новостей пока нет</p>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock %}

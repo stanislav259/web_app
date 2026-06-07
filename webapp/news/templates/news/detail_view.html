@@ -1,0 +1,55 @@
+{% extends 'main/layout.html' %}
+
+{% block title %}{{ article.title }}а{% endblock %}
+
+{% block content %}
+    <div class="features">
+    <h1>{{ article.title }}</h1>
+    {% if article.image %}
+    <div class="news-image">
+        <img src="{{ article.image.url }}" style="max-width: 100%; max-height: 400px; border-radius: 10px; margin: 20px 0;">
+    </div>
+    {% endif %}
+    <p><strong>Дата публикации:</strong> {{ article.date|date:"d.m.Y H:i" }}</p>
+    <p><strong>Автор:</strong> {{ article.author.username }}</p>
+    <p><strong>Текст новости:</strong></p>
+    <p>{{ article.full_text }}</p>
+    
+    <!-- Блок лайков/дизлайков -->
+    <div class="rating-block">
+        <div class="rating-stats">
+            <span class="likes-count">👍 {{ article.total_likes }}</span>
+            <span class="dislikes-count">👎 {{ article.total_dislikes }}</span>
+        </div>
+        
+        {% if user.is_authenticated %}
+            <div class="rating-buttons">
+                <a href="{% url 'like_article' article.id %}" class="like-btn">
+                    👍 Лайк
+                    {% if user in article.likes.all %}
+                        ✓
+                    {% endif %}
+                </a>
+                <a href="{% url 'dislike_article' article.id %}" class="dislike-btn">
+                    👎 Дизлайк
+                    {% if user in article.dislikes.all %}
+                        ✓
+                    {% endif %}
+                </a>
+            </div>
+        {% else %}
+            <p class="login-to-rate">
+                <a href="{% url 'login' %}?next={{ request.path }}">Войдите</a>, чтобы оценить статью
+            </p>
+        {% endif %}
+    </div>
+    
+    <div class="action-buttons">
+        {% if user.is_authenticated and user == article.author or user.is_superuser %}
+            <a href="{% url 'news-update' article.id %}" class="btn btn-warning">Редактировать</a>
+            <a href="{% url 'news-delete' article.id %}" class="btn btn-danger">Удалить</a>
+        {% endif %}
+        <a href="{% url 'news_home' %}" class="btn btn-secondary">Назад к новостям</a>
+    </div>
+</div>
+{% endblock %}

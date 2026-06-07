@@ -1,0 +1,63 @@
+{% extends 'main/layout.html' %}
+{% load static %}
+
+{% block title %}Главная страница{% endblock %}
+
+{% block content %}
+<div class="features">
+    <!-- Верхняя часть - приветствие -->
+    <h1>Добро пожаловать на NewsPortal!</h1>
+    <p>Самые свежие новости из мира технологий, науки и искусства</p>
+    
+    {% if user.is_authenticated %}
+        <div class="alert alert-success">
+            Привет, {{ user.username }}! Рады видеть вас снова! 👋
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            <a href="{% url 'login' %}">Войдите</a> или <a href="{% url 'register' %}">зарегистрируйтесь</a>
+        </div>
+    {% endif %}
+    
+    <!-- Кнопка Все новости -->
+    <div style="margin: 20px 0;">
+        <a href="{% url 'news_home' %}" class="btn-all-news">📰 Все новости</a>
+        {% if user.is_authenticated %}
+            <a href="{% url 'create' %}" class="btn-create">➕ Добавить новость</a>
+        {% endif %}
+    </div>
+    
+    <!-- Блок последних новостей (как на странице новостей) -->
+    <div class="latest-news-section">
+        <h2>📌 Последние новости</h2>
+        
+        <div class="news-list">
+            {% for news in latest_news %}
+            <div class="news-card-horizontal">
+                {% if news.image %}
+                <div class="card-image-side">
+                    <img src="{{ news.image.url }}" alt="{{ news.title }}">
+                </div>
+                {% endif %}
+                <div class="card-content-side">
+                    <h3>{{ news.title }}</h3>
+                    <div class="card-meta">
+                        <span>📅 {{ news.date|date:"d.m.Y H:i" }}</span>
+                        <span>👤 {{ news.author.username }}</span>
+                    </div>
+                    <p>{{ news.anons|truncatewords:30 }}</p>
+                    <div class="card-rating">
+                        <span class="likes">👍 {{ news.likes.count }}</span>
+                        <span class="dislikes">👎 {{ news.dislikes.count }}</span>
+                    </div>
+                    <a href="{% url 'news-detail' news.id %}" class="read-more">Читать далее →</a>
+                </div>
+            </div>
+            {% empty %}
+            <p class="no-news">Новостей пока нет. Будьте первым!</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+

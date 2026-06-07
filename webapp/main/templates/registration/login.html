@@ -1,0 +1,29 @@
+{% extends 'main/layout.html' %}
+
+{% block title %}Вход на сайт{% endblock %}
+
+{% block content %}
+<div class="features" style="max-width: 500px; margin: 50px auto;">
+    <h1>Вход на сайт</h1>
+    
+    {% if form.errors %}
+        <div class="alert alert-danger">
+            <i class="fa-solid fa-circle-exclamation"></i> Неверное имя пользователя или пароль
+        </div>
+    {% endif %}
+    
+    <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="username" class="form-label">Имя пользователя:</label>
+            <input type="text" name="username" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label for="password" class="form-label">Пароль:</label>
+            <input type="password" name="password" class="form-control" required>
+        </div>
+        <button type="submit" class="btn btn-primary"><i class="fa-solid fa-sign-in-alt"></i> Войти</button>
+        <a href="{% url 'register' %}" class="btn btn-secondary"><i class="fa-solid fa-user-plus"></i> Регистрация</a>
+    </form>
+</div>
+{% endblock %}

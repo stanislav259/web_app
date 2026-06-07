@@ -1,0 +1,113 @@
+{% extends 'main/layout.html' %}
+
+{% block title %}Профиль пользователя{% endblock %}
+
+{% block content %}
+<div class="features">
+    <h1>Профиль пользователя</h1>
+    <p>Добро пожаловать, {{ user.username }}!</p>
+    
+    <!-- Сообщения об успехе/ошибке -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{% if message.tags == 'success' %}success{% else %}info{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+    
+    <!-- Вкладки -->
+    <div class="profile-tabs">
+        <button class="tab-btn active" onclick="showTab('profile-tab')">Личные данные</button>
+        <button class="tab-btn" onclick="showTab('password-tab')">Смена пароля</button>
+    </div>
+    
+    <!-- Вкладка с личными данными -->
+    <div id="profile-tab" class="tab-content active">
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="update_profile" value="1">
+            
+            {% for field in form %}
+                <div class="form-group">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                        <div class="error">{{ field.errors }}</div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+            
+            <button type="submit" class="btn-save">Сохранить изменения</button>
+        </form>
+    </div>
+    
+    <!-- Вкладка со сменой пароля -->
+    <div id="password-tab" class="tab-content">
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="change_password" value="1">
+            
+            <div class="form-group">
+                <label for="id_old_password">Старый пароль</label>
+                {{ password_form.old_password }}
+            </div>
+            
+            <div class="form-group">
+                <label for="id_new_password1">Новый пароль</label>
+                {{ password_form.new_password1 }}
+                {% if password_form.new_password1.help_text %}
+                    <small class="help-text">{{ password_form.new_password1.help_text }}</small>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label for="id_new_password2">Подтверждение пароля</label>
+                {{ password_form.new_password2 }}
+            </div>
+            
+            {% if password_form.errors %}
+                <div class="error">
+                    {% for field in password_form %}
+                        {% for error in field.errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    {% endfor %}
+                </div>
+            {% endif %}
+            
+            <button type="submit" class="btn-save">Сменить пароль</button>
+        </form>
+    </div>
+    
+    <div class="profile-info">
+        <h3>Информация об аккаунте</h3>
+        <p><strong>Дата регистрации:</strong> {{ user.date_joined|date:"d.m.Y" }}</p>
+        <p><strong>Последний вход:</strong> {{ user.last_login|date:"d.m.Y H:i" }}</p>
+    </div>
+    <div class="user-news-section">
+    <h3>📰 Мои новости</h3>
+    
+    {% if user_news %}
+        <div class="user-news-list">
+            {% for news in user_news %}
+                <div class="user-news-item">
+                    <div class="news-info">
+                        <h4>{{ news.title }}</h4>
+                        <p class="news-date">{{ news.date|date:"d.m.Y H:i" }}</p>
+                        <p class="news-anons">{{ news.anons|truncatewords:30 }}</p>
+                    </div>
+                    <div class="news-actions">
+                        <a href="{% url 'news-detail' news.id %}" class="btn-view">Просмотр</a>
+                        <a href="{% url 'news-update' news.id %}" class="btn-edit">Редактировать</a>
+                        <a href="{% url 'news-delete' news.id %}" class="btn-delete">Удалить</a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="no-news">У вас пока нет новостей. <a href="{% url 'create' %}">Создайте первую новость!</a></p>
+    {% endif %}
+    </div>
+</div>
+{% endblock %}
